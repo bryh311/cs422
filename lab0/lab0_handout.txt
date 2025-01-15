@@ -1,0 +1,134 @@
+
+      CS 422 - PSO 1: Introduction to Network Commands and Multihomed Systems
+
+      				Deadline: Aug 23rd 2024, 11:59 pm
+
+Objectives
+	By the end of this PSO, you will:
+	1. Understand the concept of a multihomed computer
+	2. Use basic network commands like `ifconfig` and `dig`
+	3. Compile and run a simple C program that executes system commands
+
+Part A: Logging into the Xinu Lab
+
+1. Log into a machine in the Xinu lab from the machines in HAAS G050 using ssh. Username will be your Purdue username.  Choose one of the machines
+
+	xinu01.cs.purdue.edu   through    xinu24.cs.purdue.edu
+
+
+Part B: Using ifconfig
+
+1. Log into a front-end machine in the Xinu lab.
+2. Run the `ifconfig` command to find the IPv4 addresses of the frontend.
+3. Note: We're interested in the addresses labeled 'inet', NOT 'inet6'.
+4. There are *many* lines of output.  Try to find a simple solution to
+   filter the output so you only see lines with inet and not inet6
+5. Observe that there are multiple IP addresses. This indicates that the machine
+    is connected to multiple networks (e.g., one for the lab, one for the backend
+    ARM machines, one for the backend x86 machines, etc.).  In fact, the networks
+    are *virtual* because they all go over a connection to an Ethernet switch.
+
+Submit: The command or commands you used to filter the output.
+ifconfig | grep inet | grep -v inet6
+
+Part C: Using dig
+
+1. Use the `dig` command to lookup the IP address of the frontend you're using.
+2. For example, if you're logged into xinu05:
+
+   dig xinu05.cs.purdue.edu
+
+3. Look for the Answer section in the output. The IP address here should match the
+   first IP address you found using `ifconfig`.
+4. Example output:
+
+   ;; ANSWER SECTION:
+   xinu05.cs.purdue.edu.   86400   IN      A       128.10.3.55
+
+
+Submit: The ANSWER SECTION from your output.
+   xinu17.cs.purdue.edu.  86400    IN     A        128.10.3.67
+
+Part D: Compiling and Running a C Program
+
+1. Create a new C file named `network_info.c` with the following content:
+
+   #include <stdlib.h>
+
+   int main(void) {
+       system("ifconfig");
+       return 0;
+   }
+
+2. Compile the program:
+
+   gcc -o network_info network_info.c
+
+3. Run the compiled program:
+
+   ./network_info
+
+4. Observe that the output is the same as running `ifconfig` directly.
+
+
+Key Concepts to Discuss
+- Multihomed computers: Explain what they are and why they're used in network environments.
+Multihomed systems are computer that have multiple IP addresses. They are used in networking
+to ensure that a system has a reliable connection to the network, as packets can be rerouted through different
+networks.
+
+- The `system()` function in C: Discuss its purpose and potential uses in network programming.
+The system() function runs the command that is passed to it and prints the output to the standard out.
+The system() command could be used to get network information for a given computer on a network in a program.
+
+- Importance of network commands in system administration and network troubleshooting.
+Its important to know what subnets a computer is connected to and if it is connected to the network at all.
+For example, if you want to test if a computer is connected to the internet, you can always try "ping www.google.com"
+and see if you get a response.
+
+Part E: Submit answers to the following questions:
+
+1. Can your laptop connect to multiple networks?
+yes, your laptop could connect to a wireless network and a wired network at the same time assuming it has a
+ethernet port.
+
+2. Why might a computer be connected to multiple networks?  Why not just connect all computers to a single network?
+One reason why a computer might be connected to multiple networks is for reliability. Another reason for a computer
+to be connected to multiple networks (which I ran into at my internship) is that the other systems on the subnet
+might not have a default gateway to escape the subnet, and you have find a computer connected to both subnets
+to route through to communicate with that computer. Connecting all computers to a single network could have
+security vulnerabilities as its harder to segment the computers out.
+
+3. What are some advantages and potential security concerns of using the `system()` function in C programs?
+Extra credit (optional): How could you modify the C program to run both `ifconfig` and `dig` commands?
+One advantage to using the system command is that it is very easy to execute, compared to have to fork the
+process and run execvp on the command that you want to run. A security issue with the system comand is path
+injection, Where an attacker adds to the PATH variable a different path to search for the program, and through
+that they could execute a different program.
+
+#include <stdio.h>
+#include <string.h>
+
+int main(int argc, char** argv)
+{
+  if (argc != 2)
+  {
+    printf("usage: ifconfig_dig <computer name>\n");
+  }
+
+  system("ifconfig");
+
+
+  // admittedly, this code is very vulnerable to buffer overflows,
+  // but we're using `system()` already so its not like security is a super concern
+  char buf[1000] = "dig ";
+  strcat(buf, argv[1]);
+
+  system(buf);
+  
+  return 0;
+}
+
+
+
+Submit your answers in a file named "lab0_answer.pdf" on Brightspace.

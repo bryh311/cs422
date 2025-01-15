@@ -1,0 +1,16 @@
+1. using the socket api, you can lookup the hostname by using getaddrinfo(). This command
+stores all of the ip addresses associated with a given hostname into a linked list, and when
+connecting, it cycles through the linked list trying ip addresses to connect to.
+
+2. it gives the connecting computer more ways to connect with the server, which imporves
+reliability compared to just using a single ip address which the clienet might not be able to 
+connect with.
+
+3. some issues that could arise with using a specific IP address could include load balancing,
+if a server has a hostname bound to multiple IP addresses, it can load balance the clients to
+different network interfaces, which can't be done with using just the IP address. Another issue
+that could arise with using a specific IP address is DHCP, which changes the IP addresses dynamically
+but not the hostname
+
+4. every client on the different networks can check each of the IPs and connect to the one that
+uses the network that they are connected to.
